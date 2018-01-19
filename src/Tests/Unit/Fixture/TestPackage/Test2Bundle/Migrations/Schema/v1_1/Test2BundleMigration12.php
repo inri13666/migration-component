@@ -1,11 +1,11 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test2Bundle\Migrations\Schema\v1_1;
+namespace Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\Test2Bundle\Migrations\Schema\v1_1;
 
 use Doctrine\DBAL\Schema\Schema;
-use Okvpn\Bundle\MigrationBundle\Migration\Migration;
-use Okvpn\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
-use Okvpn\Bundle\MigrationBundle\Migration\QueryBag;
+use Okvpn\Component\Migration\Migration\Migration;
+use Okvpn\Component\Migration\Migration\OrderedMigrationInterface;
+use Okvpn\Component\Migration\Migration\QueryBag;
 
 class Test2BundleMigration12 implements Migration, OrderedMigrationInterface
 {

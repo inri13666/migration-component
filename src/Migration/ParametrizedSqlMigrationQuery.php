@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Migration;
+namespace Okvpn\Component\Migration\Migration;
 
 use Psr\Log\LoggerInterface;
 
@@ -14,9 +14,9 @@ class ParametrizedSqlMigrationQuery extends ParametrizedMigrationQuery
     /**
      * Adds SQL query
      *
-     * @param string $query  The SQL query
-     * @param array  $params The parameters to bind to the query, if any.
-     * @param array  $types  The types the previous parameters are in.
+     * @param string $query The SQL query
+     * @param array $params The parameters to bind to the query, if any.
+     * @param array $types The types the previous parameters are in.
      */
     public function __construct($query = null, array $params = [], array $types = [])
     {
@@ -28,9 +28,9 @@ class ParametrizedSqlMigrationQuery extends ParametrizedMigrationQuery
     /**
      * Adds SQL query
      *
-     * @param string $query  The SQL query
-     * @param array  $params The parameters to bind to the query, if any.
-     * @param array  $types  The types the previous parameters are in.
+     * @param string $query The SQL query
+     * @param array $params The parameters to bind to the query, if any.
+     * @param array $types The types the previous parameters are in.
      */
     public function addSql($query, array $params = [], array $types = [])
     {
@@ -58,7 +58,7 @@ class ParametrizedSqlMigrationQuery extends ParametrizedMigrationQuery
 
     /**
      * @param LoggerInterface $logger
-     * @param bool            $dryRun
+     * @param bool $dryRun
      */
     protected function processQueries(LoggerInterface $logger, $dryRun = false)
     {

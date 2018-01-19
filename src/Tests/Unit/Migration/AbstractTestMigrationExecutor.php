@@ -1,11 +1,11 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Tests\Unit\Migration;
+namespace Okvpn\Component\Migration\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 
-use Okvpn\Bundle\MigrationBundle\Migration\ArrayLogger;
-use Okvpn\Bundle\MigrationBundle\Migration\MigrationQueryExecutor;
+use Okvpn\Component\Migration\Migration\ArrayLogger;
+use Okvpn\Component\Migration\Migration\MigrationQueryExecutor;
 
 class AbstractTestMigrationExecutor extends \PHPUnit_Framework_TestCase
 {

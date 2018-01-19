@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Migration\Schema;
+namespace Okvpn\Component\Migration\Migration\Schema;
 
 use Doctrine\DBAL\Schema\Column as BaseColumn;
 
@@ -28,13 +28,13 @@ class Column extends BaseColumn
             'Notnull',
             'Default',
             'Autoincrement',
-            'Comment'
+            'Comment',
         ];
 
         $options = [];
         foreach ($optionNames as $name) {
             $method = "get" . $name;
-            $val    = $baseColumn->$method();
+            $val = $baseColumn->$method();
             if ($this->$method() !== $val) {
                 $options[$name] = $val;
             }

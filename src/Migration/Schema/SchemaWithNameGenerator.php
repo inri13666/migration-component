@@ -1,15 +1,15 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Migration\Schema;
+namespace Okvpn\Component\Migration\Migration\Schema;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\Sequence;
-use Okvpn\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
+use Okvpn\Component\Migration\Tools\DbIdentifierNameGenerator;
 
 class SchemaWithNameGenerator extends Schema
 {
-    const TABLE_CLASS = 'Okvpn\Bundle\MigrationBundle\Migration\Schema\TableWithNameGenerator';
+    const TABLE_CLASS = 'Okvpn\Component\Migration\Migration\Schema\TableWithNameGenerator';
 
     /**
      * @var DbIdentifierNameGenerator
@@ -18,9 +18,9 @@ class SchemaWithNameGenerator extends Schema
 
     /**
      * @param DbIdentifierNameGenerator $nameGenerator
-     * @param Table[]                   $tables
-     * @param Sequence[]                $sequences
-     * @param SchemaConfig              $schemaConfig
+     * @param Table[] $tables
+     * @param Sequence[] $sequences
+     * @param SchemaConfig $schemaConfig
      */
     public function __construct(
         DbIdentifierNameGenerator $nameGenerator,

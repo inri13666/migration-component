@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Provider;
+namespace Okvpn\Component\Migration\Provider;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -42,7 +42,6 @@ final class OrmSchemaProvider implements SchemaProviderInterface
         return $tool->getSchemaFromMetadata($metadata);
     }
 
-
     /**
      * Doctrine's EntityManagerInterface was introduced in version 2.4, since this
      * library allows those older version we need to be able to check for those
@@ -52,6 +51,7 @@ final class OrmSchemaProvider implements SchemaProviderInterface
      * doesn't care.
      *
      * @param   mixed $manager Hopefully an entity manager, but it may be anything
+     *
      * @return  boolean
      */
     private function isEntityManager($manager)

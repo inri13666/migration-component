@@ -1,20 +1,19 @@
 <?php
 
-declare(strict_types = 1);
+namespace Okvpn\Component\Migration\EventListener;
 
-namespace Okvpn\Bundle\MigrationBundle\EventListener;
-
-use Okvpn\Bundle\MigrationBundle\Event\PreMigrationEvent;
-use Okvpn\Bundle\MigrationBundle\Migration\CreateMigrationTableMigration;
+use Okvpn\Component\Migration\Event\PreMigrationEvent;
+use Okvpn\Component\Migration\Migration\CreateMigrationTableMigration;
 
 class PreUpMigrationListener
 {
+    /** @var string */
     private $migrationTable;
 
     /**
      * @param string $migrationTable
      */
-    public function __construct(string $migrationTable)
+    public function __construct($migrationTable)
     {
         $this->migrationTable = $migrationTable;
     }

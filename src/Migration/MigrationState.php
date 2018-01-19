@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Migration;
+namespace Okvpn\Component\Migration\Migration;
 
 class MigrationState
 {
@@ -22,15 +22,15 @@ class MigrationState
     protected $state;
 
     /**
-     * @param Migration   $migration
+     * @param Migration $migration
      * @param string|null $bundleName
      * @param string|null $version
      */
     public function __construct(Migration $migration, $bundleName = null, $version = null)
     {
-        $this->migration  = $migration;
+        $this->migration = $migration;
         $this->bundleName = $bundleName;
-        $this->version    = $version;
+        $this->version = $version;
     }
 
     /**

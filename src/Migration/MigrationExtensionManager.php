@@ -1,12 +1,12 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Migration;
+namespace Okvpn\Component\Migration\Migration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Okvpn\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
-use Okvpn\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
-use Okvpn\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
+use Okvpn\Component\Migration\Migration\Extension\DatabasePlatformAwareInterface;
+use Okvpn\Component\Migration\Migration\Extension\NameGeneratorAwareInterface;
+use Okvpn\Component\Migration\Tools\DbIdentifierNameGenerator;
 
 class MigrationExtensionManager
 {
@@ -88,7 +88,7 @@ class MigrationExtensionManager
     /**
      * Registers an extension
      *
-     * @param string $name      The extension name
+     * @param string $name The extension name
      * @param object $extension The extension object
      */
     public function addExtension($name, $extension)
@@ -107,7 +107,7 @@ class MigrationExtensionManager
         $this->extensions[$name] = [
             $extension,
             $extensionAwareInterfaceName,
-            $this->getSetExtensionMethodName($extensionAwareInterfaceName)
+            $this->getSetExtensionMethodName($extensionAwareInterfaceName),
         ];
 
         $this->isDependenciesUpToDate = false;
@@ -165,6 +165,7 @@ class MigrationExtensionManager
      * Gets an name of interface which should be used to register an extension in a migration class
      *
      * @param object $extension
+     *
      * @return string
      * @throws \RuntimeException if the interface is not found
      */
@@ -207,6 +208,7 @@ class MigrationExtensionManager
      * Gets a name of set extension method
      *
      * @param string $extensionAwareInterfaceName
+     *
      * @return string
      * @throws \RuntimeException if set method is not found
      */

@@ -1,8 +1,8 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Tests\Unit\Migration;
+namespace Okvpn\Component\Migration\Tests\Unit\Migration;
 
-use Okvpn\Bundle\MigrationBundle\Migration\SqlSchemaUpdateMigrationQuery;
+use Okvpn\Component\Migration\Migration\SqlSchemaUpdateMigrationQuery;
 
 class SqlSchemaUpdateMigrationQueryTest extends \PHPUnit_Framework_TestCase
 {
@@ -10,8 +10,8 @@ class SqlSchemaUpdateMigrationQueryTest extends \PHPUnit_Framework_TestCase
     {
         $query = new SqlSchemaUpdateMigrationQuery('ALTER TABLE');
 
-        $this->assertInstanceOf('Okvpn\Bundle\MigrationBundle\Migration\SqlMigrationQuery', $query);
-        $this->assertInstanceOf('Okvpn\Bundle\MigrationBundle\Migration\SchemaUpdateQuery', $query);
+        $this->assertInstanceOf('Okvpn\Component\Migration\Migration\SqlMigrationQuery', $query);
+        $this->assertInstanceOf('Okvpn\Component\Migration\Migration\SchemaUpdateQuery', $query);
         $this->assertTrue($query->isUpdateRequired());
     }
 }

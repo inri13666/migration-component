@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Migration\Extension;
+namespace Okvpn\Component\Migration\Migration\Extension;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 

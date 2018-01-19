@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Migration;
+namespace Okvpn\Component\Migration\Migration;
 
 use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
@@ -49,7 +49,7 @@ class MigrationQueryExecutor
      * Executes the given query
      *
      * @param string|MigrationQuery $query
-     * @param bool                  $dryRun
+     * @param bool $dryRun
      */
     public function execute($query, $dryRun)
     {

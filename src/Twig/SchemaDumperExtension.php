@@ -1,15 +1,15 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Twig;
+namespace Okvpn\Component\Migration\Twig;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\EntityManager;
 
 class SchemaDumperExtension extends \Twig_Extension
 {
-    /** @var ManagerRegistry */
+    /** @var EntityManager */
     protected $doctrine;
 
     /** @var AbstractPlatform */
@@ -34,9 +34,9 @@ class SchemaDumperExtension extends \Twig_Extension
     ];
 
     /**
-     * @param ManagerRegistry $doctrine
+     * @param EntityManager $doctrine
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(EntityManager $doctrine)
     {
         $this->doctrine = $doctrine;
     }

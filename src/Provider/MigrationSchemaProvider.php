@@ -1,12 +1,11 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Provider;
+namespace Okvpn\Component\Migration\Provider;
 
 use Doctrine\DBAL\Schema\Schema;
-
-use Okvpn\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader;
-use Okvpn\Bundle\MigrationBundle\Migration\MigrationState;
-use Okvpn\Bundle\MigrationBundle\Migration\QueryBag;
+use Okvpn\Component\Migration\Migration\Loader\MigrationsLoader;
+use Okvpn\Component\Migration\Migration\MigrationState;
+use Okvpn\Component\Migration\Migration\QueryBag;
 
 /**
  * A schema provider that uses the current migrations to generate schemas.

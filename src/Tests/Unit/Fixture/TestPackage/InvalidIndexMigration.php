@@ -1,10 +1,10 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage;
+namespace Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage;
 
 use Doctrine\DBAL\Schema\Schema;
-use Okvpn\Bundle\MigrationBundle\Migration\Migration;
-use Okvpn\Bundle\MigrationBundle\Migration\QueryBag;
+use Okvpn\Component\Migration\Migration\Migration;
+use Okvpn\Component\Migration\Migration\QueryBag;
 
 class InvalidIndexMigration implements Migration
 {

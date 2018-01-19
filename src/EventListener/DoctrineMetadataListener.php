@@ -1,23 +1,22 @@
 <?php
 
-declare(strict_types = 1);
-
-namespace Okvpn\Bundle\MigrationBundle\EventListener;
+namespace Okvpn\Component\Migration\EventListener;
 
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Okvpn\Bundle\MigrationBundle\Entity\DataMigration;
+use Okvpn\Component\Migration\Entity\DataMigration;
 
 class DoctrineMetadataListener
 {
     const DEFAULT_TABLE = 'okvpn_fixture_data';
 
+    /** @var string */
     private $migrationTable;
 
     /**
      * @param string $migrationTable
      */
-    public function __construct(string $migrationTable)
+    public function __construct($migrationTable)
     {
         $this->migrationTable = $migrationTable;
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Migration;
+namespace Okvpn\Component\Migration\Migration;
 
 interface DataStorageInterface
 {
@@ -13,7 +13,7 @@ interface DataStorageInterface
 
     /**
      * @param string $key
-     * @param mixed  $default
+     * @param mixed $default
      *
      * @return mixed
      */
@@ -21,7 +21,7 @@ interface DataStorageInterface
 
     /**
      * @param string $key
-     * @param mixed  $value
+     * @param mixed $value
      */
     public function set($key, $value);
 

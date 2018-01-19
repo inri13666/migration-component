@@ -1,19 +1,19 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Tests\Unit\Migration;
+namespace Okvpn\Component\Migration\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\Type;
 
-use Okvpn\Bundle\MigrationBundle\Migration\MigrationExecutor;
-use Okvpn\Bundle\MigrationBundle\Migration\MigrationState;
-use Okvpn\Bundle\MigrationBundle\Migration\QueryBag;
-use Okvpn\Bundle\MigrationBundle\Migration\SqlSchemaUpdateMigrationQuery;
-use Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\IndexMigration;
-use Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle\Migrations\Schema\Test1BundleInstallation;
-use Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\UpdatedColumnIndexMigration;
+use Okvpn\Component\Migration\Migration\MigrationExecutor;
+use Okvpn\Component\Migration\Migration\MigrationState;
+use Okvpn\Component\Migration\Migration\QueryBag;
+use Okvpn\Component\Migration\Migration\SqlSchemaUpdateMigrationQuery;
+use Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\IndexMigration;
+use Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\Test1Bundle\Migrations\Schema\Test1BundleInstallation;
+use Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\UpdatedColumnIndexMigration;
 
 class MigrationExecutorTest extends AbstractTestMigrationExecutor
 {
@@ -48,18 +48,18 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
 
         $this->expectException('\RuntimeException');
         $this->expectExceptionMessage(
-            'Failed migrations: Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\InvalidIndexMigration.'
+            'Failed migrations: Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\InvalidIndexMigration.'
         );
 
         $this->executor->executeUp($migrationsToExecute);
         $this->assertEquals(
-            '> Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\InvalidIndexMigration',
+            '> Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\InvalidIndexMigration',
             $this->logger->getMessages()[0]
         );
         $this->assertEquals(
             '  ERROR: Could not create index for column with length more than 255.'
             . ' Please correct "key" column length "index_table" in table in'
-            . ' "Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\InvalidIndexMigration" migration',
+            . ' "Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\InvalidIndexMigration" migration',
             $this->logger->getMessages()[1]
         );
     }
@@ -79,17 +79,17 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
 
         $this->executor->executeUp($migrationsToExecute);
         $this->assertEquals(
-            '> Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\UpdatedColumnIndexMigration',
+            '> Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\UpdatedColumnIndexMigration',
             $this->logger->getMessages()[2]
         );
         $this->assertEquals(
             '  ERROR: Could not create index for column with length more than 255.'
             . ' Please correct "key" column length "index_table2" in table in'
-            . ' "Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\UpdatedColumnIndexMigration" migration',
+            . ' "Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\UpdatedColumnIndexMigration" migration',
             $this->logger->getMessages()[3]
         );
         $this->assertEquals(
-            '> Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle\Migrations\Schema'
+            '> Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\Test1Bundle\Migrations\Schema'
             . '\Test1BundleInstallation - skipped',
             $this->logger->getMessages()[4]
         );
@@ -105,7 +105,7 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
 
         $schemaUpdateQuery = new SqlSchemaUpdateMigrationQuery('ALTER TABLE');
 
-        $migration = $this->createMock('Okvpn\Bundle\MigrationBundle\Migration\Migration');
+        $migration = $this->createMock('Okvpn\Component\Migration\Migration\Migration');
         $migration->expects($this->once())
             ->method('up')
             ->willReturnCallback(

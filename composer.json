@@ -1,9 +1,9 @@
 {
-    "name": "okvpn/migration-bundle",
-    "type": "symfony-bundle",
-    "description": "Database Schema migrations using Doctrine",
-    "keywords": ["Migration", "Schema", "Symfony Migration"],
-    "homepage": "https://github.com/okvpn/migration-bundle",
+    "name": "okvpn/migration-component",
+    "type": "library",
+    "description": "COmponent for Database Schema migrations using Doctrine",
+    "keywords": ["Migration", "Schema", "Database Migration"],
+    "homepage": "https://github.com/okvpn/migration-component",
     "license": "MIT",
     "authors": [
         {
@@ -13,17 +13,18 @@
     ],
     "require": {
         "php": ">=7.0",
-        "symfony/framework-bundle": "~2.7|~3.0|~4.0",
-        "symfony/doctrine-bridge": "~2.7|~3.0|~4.0",
-        "symfony/twig-bundle": "~2.7|~3.0|~4.0",
         "doctrine/dbal": "^2.1",
-        "doctrine/orm": "^2.1"
+        "doctrine/orm": "^2.1",
+        "symfony/event-dispatcher": "~2.5|~3.0|~4.0",
+        "symfony/finder": "~2.5|~3.0|~4.0",
+        "twig/twig": "~1.18"
     },
     "require-dev": {
+        "symfony/console": "~2.5|~3.0|~4.0",
         "phpunit/phpunit": "^5.7"
     },
     "autoload": {
-        "psr-4": { "Okvpn\\Bundle\\MigrationBundle\\": "src" }
+        "psr-4": { "Okvpn\\Component\\Migration\\": "src" }
     },
     "extra": {
         "branch-alias": {

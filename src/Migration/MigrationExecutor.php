@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Migration;
+namespace Okvpn\Component\Migration\Migration;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
@@ -14,10 +14,8 @@ use Doctrine\DBAL\Schema\SchemaDiff;
 use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
-
+use Okvpn\Component\Migration\Exception\InvalidNameException;
 use Psr\Log\LoggerInterface;
-
-use Okvpn\Bundle\MigrationBundle\Exception\InvalidNameException;
 
 class MigrationExecutor
 {
@@ -81,7 +79,7 @@ class MigrationExecutor
      * Executes UP method for the given migrations
      *
      * @param MigrationState[] $migrations
-     * @param bool             $dryRun
+     * @param bool $dryRun
      *
      * @throws \RuntimeException if at lease one migration failed
      */
@@ -112,10 +110,10 @@ class MigrationExecutor
     }
 
     /**
-     * @param Schema           $schema
+     * @param Schema $schema
      * @param AbstractPlatform $platform
-     * @param Migration        $migration
-     * @param bool             $dryRun
+     * @param Migration $migration
+     * @param bool $dryRun
      *
      * @return bool
      */
@@ -173,13 +171,13 @@ class MigrationExecutor
     /**
      * Creates a database schema object
      *
-     * @param Table[]           $tables
-     * @param Sequence[]        $sequences
+     * @param Table[] $tables
+     * @param Sequence[] $sequences
      * @param SchemaConfig|null $schemaConfig
      *
      * @return Schema
      */
-    protected function createSchemaObject(array $tables = [], array $sequences = [], $schemaConfig = null)
+    protected function createSchemaObject(array $tables = [], array $sequences = [], SchemaConfig $schemaConfig = null)
     {
         return new Schema($tables, $sequences, $schemaConfig);
     }
@@ -200,7 +198,7 @@ class MigrationExecutor
      * Validates the given tables from SchemaDiff
      *
      * @param SchemaDiff $schemaDiff
-     * @param Migration  $migration
+     * @param Migration $migration
      *
      * @throws InvalidNameException if invalid table or column name is detected
      */
@@ -223,8 +221,8 @@ class MigrationExecutor
     /**
      * Validates the given columns
      *
-     * @param string    $tableName
-     * @param Column[]  $columns
+     * @param string $tableName
+     * @param Column[] $columns
      * @param Migration $migration
      *
      * @throws InvalidNameException if invalid column name is detected
@@ -239,7 +237,7 @@ class MigrationExecutor
     /**
      * Validates table name
      *
-     * @param string    $tableName
+     * @param string $tableName
      * @param Migration $migration
      *
      * @throws InvalidNameException if table name is invalid
@@ -251,8 +249,8 @@ class MigrationExecutor
     /**
      * Validates column name
      *
-     * @param string    $tableName
-     * @param string    $columnName
+     * @param string $tableName
+     * @param string $columnName
      * @param Migration $migration
      *
      * @throws InvalidNameException if column name is invalid
@@ -263,7 +261,7 @@ class MigrationExecutor
 
     /**
      * @param SchemaDiff $schemaDiff
-     * @param Migration  $migration
+     * @param Migration $migration
      */
     protected function checkIndexes(SchemaDiff $schemaDiff, Migration $migration)
     {
@@ -285,8 +283,8 @@ class MigrationExecutor
     }
 
     /**
-     * @param Table     $table
-     * @param Index     $index
+     * @param Table $table
+     * @param Index $index
      * @param Migration $migration
      *
      * @throws InvalidNameException

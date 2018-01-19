@@ -1,13 +1,13 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Tools;
+namespace Okvpn\Component\Migration\Tools;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Visitor\AbstractVisitor;
 
 class SchemaDumper extends AbstractVisitor
 {
-    const SCHEMA_TEMPLATE = '@OkvpnMigration/schema-template.php.twig';
+    const SCHEMA_TEMPLATE = 'schema-template.php.twig';
     const DEFAULT_CLASS_NAME = 'AllMigration';
     const DEFAULT_VERSION = 'v1_0';
 
@@ -30,7 +30,7 @@ class SchemaDumper extends AbstractVisitor
      * @param \Twig_Environment $twig
      * @param string $migrationPath
      */
-    public function __construct(\Twig_Environment $twig, string $migrationPath)
+    public function __construct(\Twig_Environment $twig, $migrationPath)
     {
         $this->twig = $twig;
         $this->migrationPath = $migrationPath;
@@ -50,6 +50,7 @@ class SchemaDumper extends AbstractVisitor
      * @param string $className
      * @param string $version
      * @param array|null $extendedOptions
+     *
      * @return string
      */
     public function dump(

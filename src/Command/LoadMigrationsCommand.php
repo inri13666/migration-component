@@ -1,19 +1,18 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Command;
+namespace Okvpn\Component\Migration\Command;
 
+use Okvpn\Component\Migration\Command\Helper\MigrationConsoleHelper;
+use Okvpn\Component\Migration\Migration\Loader\MigrationsLoader;
+use Okvpn\Component\Migration\Migration\MigrationExecutor;
 use Psr\Log\LogLevel;
-
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Okvpn\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader;
-use Okvpn\Bundle\MigrationBundle\Migration\MigrationExecutor;
-
-class LoadMigrationsCommand extends ContainerAwareCommand
+class LoadMigrationsCommand extends Command
 {
     /**
      * @inheritdoc
@@ -97,22 +96,20 @@ class LoadMigrationsCommand extends ContainerAwareCommand
     }
 
     /**
+     * @return MigrationConsoleHelper
+     */
+    protected function getOkvpnMigrationHelper()
+    {
+        return $this->getHelper(MigrationConsoleHelper::NAME);
+    }
+
+    /**
      * @param InputInterface $input
      * @return MigrationsLoader
      */
     protected function getMigrationLoader(InputInterface $input)
     {
-        $migrationLoader = $this->getContainer()->get('okvpn_migration.migrations.loader');
-        $bundles         = $input->getOption('bundles');
-        if (!empty($bundles)) {
-            $migrationLoader->setBundles($bundles);
-        }
-        $excludeBundles = $input->getOption('exclude');
-        if (!empty($excludeBundles)) {
-            $migrationLoader->setExcludeBundles($excludeBundles);
-        }
-
-        return $migrationLoader;
+        return $this->getOkvpnMigrationHelper()->getMigrationLoader();
     }
 
     /**
@@ -120,7 +117,7 @@ class LoadMigrationsCommand extends ContainerAwareCommand
      */
     protected function getMigrationExecutor()
     {
-        return $this->getContainer()->get('okvpn_migration.migrations.executor');
+        return $this->getOkvpnMigrationHelper()->getMigrationExecutor();
     }
 
     /**

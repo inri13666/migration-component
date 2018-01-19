@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Event;
+namespace Okvpn\Component\Migration\Event;
 
 class MigrationEvents
 {

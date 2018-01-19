@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Migration\Schema;
+namespace Okvpn\Component\Migration\Migration\Schema;
 
 use Doctrine\DBAL\Schema\Schema as BaseSchema;
 use Doctrine\DBAL\Schema\Table as BaseTable;
@@ -14,7 +14,7 @@ class Schema extends BaseSchema
 {
     /**
      * Used table class, define TABLE_CLASS constant in an extended class to extend the table class
-     * Important: your class must extend Okvpn\Bundle\MigrationBundle\Migration\Schema\Table class
+     * Important: your class must extend Okvpn\Component\Migration\Migration\Schema\Table class
      *            or extend Doctrine\DBAL\Schema\Table class and must have __construct(array $args) method
      */
     const TABLE_CLASS = 'Doctrine\DBAL\Schema\Table';
@@ -24,6 +24,7 @@ class Schema extends BaseSchema
      *
      * @param array $args An arguments for TABLE_CLASS class constructor
      *                    An instance of a base table is in 'table' element
+     *
      * @return BaseTable
      */
     protected function createTableObject(array $args)

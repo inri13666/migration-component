@@ -1,14 +1,14 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Tests\Unit\Migration\Loader;
+namespace Okvpn\Component\Migration\Tests\Unit\Migration\Loader;
 
-use Okvpn\Bundle\MigrationBundle\Event\MigrationEvents;
-use Okvpn\Bundle\MigrationBundle\Event\PreMigrationEvent;
-use Okvpn\Bundle\MigrationBundle\Migration\MigrationState;
-use Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle\TestPackageTest1Bundle;
-use Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test2Bundle\TestPackageTest2Bundle;
+use Okvpn\Component\Migration\Event\MigrationEvents;
+use Okvpn\Component\Migration\Event\PreMigrationEvent;
+use Okvpn\Component\Migration\Migration\MigrationState;
+use Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\Test1Bundle\TestPackageTest1Bundle;
+use Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\Test2Bundle\TestPackageTest2Bundle;
 
-use Okvpn\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader;
+use Okvpn\Component\Migration\Migration\Loader\MigrationsLoader;
 
 class MigrationsLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -125,7 +125,7 @@ class MigrationsLoaderTest extends \PHPUnit_Framework_TestCase
                     $test2Bundle . '\v1_0\Test2BundleMigration11',
                     $test2Bundle . '\v1_1\Test2BundleMigration12',
                     $test2Bundle . '\v1_1\Test2BundleMigration11',
-                    'Okvpn\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration',
+                    'Okvpn\Component\Migration\Migration\UpdateBundleVersionMigration',
                 ]
             ],
             [
@@ -138,7 +138,7 @@ class MigrationsLoaderTest extends \PHPUnit_Framework_TestCase
                     $test2Bundle . '\v1_1\Test2BundleMigration11',
                     $test1Bundle . '\Test1BundleInstallation',
                     $test1Bundle . '\v1_1\Test1BundleMigration11',
-                    'Okvpn\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration',
+                    'Okvpn\Component\Migration\Migration\UpdateBundleVersionMigration',
                 ]
             ],
             [
@@ -151,7 +151,7 @@ class MigrationsLoaderTest extends \PHPUnit_Framework_TestCase
                     $test2Bundle . '\v1_0\Test2BundleMigration11',
                     $test2Bundle . '\v1_1\Test2BundleMigration12',
                     $test2Bundle . '\v1_1\Test2BundleMigration11',
-                    'Okvpn\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration',
+                    'Okvpn\Component\Migration\Migration\UpdateBundleVersionMigration',
                 ]
             ],
             [
@@ -166,7 +166,7 @@ class MigrationsLoaderTest extends \PHPUnit_Framework_TestCase
                     $test2Bundle . '\v1_0\Test2BundleMigration11',
                     $test2Bundle . '\v1_1\Test2BundleMigration12',
                     $test2Bundle . '\v1_1\Test2BundleMigration11',
-                    'Okvpn\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration',
+                    'Okvpn\Component\Migration\Migration\UpdateBundleVersionMigration',
                 ]
             ],
             [
@@ -180,7 +180,7 @@ class MigrationsLoaderTest extends \PHPUnit_Framework_TestCase
                     $test2Bundle . '\v1_0\Test2BundleMigration11',
                     $test2Bundle . '\v1_1\Test2BundleMigration12',
                     $test2Bundle . '\v1_1\Test2BundleMigration11',
-                    'Okvpn\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration',
+                    'Okvpn\Component\Migration\Migration\UpdateBundleVersionMigration',
                 ]
             ],
             [
@@ -193,7 +193,7 @@ class MigrationsLoaderTest extends \PHPUnit_Framework_TestCase
                     $test1Bundle . '\v1_1\Test1BundleMigration11',
                     $test2Bundle . '\v1_1\Test2BundleMigration12',
                     $test2Bundle . '\v1_1\Test2BundleMigration11',
-                    'Okvpn\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration',
+                    'Okvpn\Component\Migration\Migration\UpdateBundleVersionMigration',
                 ]
             ],
             [
@@ -203,7 +203,7 @@ class MigrationsLoaderTest extends \PHPUnit_Framework_TestCase
                     ['bundle' => 'TestPackageTest2Bundle', 'version' => 'v1_1'],
                 ],
                 [
-                    'Okvpn\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration',
+                    'Okvpn\Component\Migration\Migration\UpdateBundleVersionMigration',
                 ]
             ],
         ];

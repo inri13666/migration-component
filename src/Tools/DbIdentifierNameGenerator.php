@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Tools;
+namespace Okvpn\Component\Migration\Tools;
 
 class DbIdentifierNameGenerator
 {
@@ -17,11 +17,12 @@ class DbIdentifierNameGenerator
     /**
      * Builds an index name
      *
-     * @param string   $tableName
+     * @param string $tableName
      * @param string[] $columnNames
-     * @param bool     $uniqueIndex
-     * @param bool     $forceHash   If FALSE a human readable name is generated if it is possible
+     * @param bool $uniqueIndex
+     * @param bool $forceHash If FALSE a human readable name is generated if it is possible
      *                              If TRUE a name is generated based on a hash (Doctrine standard behaviour)
+     *
      * @return string
      */
     public function generateIndexName($tableName, $columnNames, $uniqueIndex = false, $forceHash = false)
@@ -38,10 +39,11 @@ class DbIdentifierNameGenerator
     /**
      * Builds a foreign key constraint name
      *
-     * @param string   $tableName
+     * @param string $tableName
      * @param string[] $columnNames
-     * @param bool     $forceHash   If FALSE a human readable name is generated if it is possible
+     * @param bool $forceHash If FALSE a human readable name is generated if it is possible
      *                              If TRUE a name is generated based on a hash (Doctrine standard behaviour)
+     *
      * @return string
      */
     public function generateForeignKeyConstraintName($tableName, $columnNames, $forceHash = false)
@@ -63,13 +65,14 @@ class DbIdentifierNameGenerator
      * very long names.
      *
      * @param string|string[] $tableNames A table name or a list of table names
-     * @param string[]        $columnNames
-     * @param string          $prefix
-     * @param bool|null       $upperCase  If TRUE the returned string is in upper case;
+     * @param string[] $columnNames
+     * @param string $prefix
+     * @param bool|null $upperCase If TRUE the returned string is in upper case;
      *                                    If FALSE the returned string is in lower case;
      *                                    If NULL the encoded name id in upper case, not encoded is in lower case
-     * @param bool            $forceHash  If FALSE a human readable name is generated if it is possible
+     * @param bool $forceHash If FALSE a human readable name is generated if it is possible
      *                                    If TRUE a name is generated based on a hash (Doctrine standard behaviour)
+     *
      * @return string
      * @throws \InvalidArgumentException
      *
@@ -91,7 +94,7 @@ class DbIdentifierNameGenerator
 
         if (!$forceHash) {
             $columns = implode('_', $columnNames);
-            $tables  = implode('_', $tableNames);
+            $tables = implode('_', $tableNames);
             if (strlen($prefix) + strlen($tables) + strlen($columns) + 2 <= $this->getMaxIdentifierSize()) {
                 $result = $prefix . '_' . $tables . '_' . $columns;
 

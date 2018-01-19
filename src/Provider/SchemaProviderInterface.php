@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Provider;
+namespace Okvpn\Component\Migration\Provider;
 
 interface SchemaProviderInterface
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle\Migrations\Schema;
+namespace Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\Test1Bundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-use Okvpn\Bundle\MigrationBundle\Migration\Installation;
-use Okvpn\Bundle\MigrationBundle\Migration\QueryBag;
+use Okvpn\Component\Migration\Migration\Installation;
+use Okvpn\Component\Migration\Migration\QueryBag;
 
 class Test1BundleInstallation implements Installation
 {

@@ -1,13 +1,11 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Event;
+namespace Okvpn\Component\Migration\Event;
 
 use Doctrine\DBAL\Connection;
-
-use Okvpn\Bundle\MigrationBundle\Tools\SafeDatabaseChecker;
+use Okvpn\Component\Migration\Migration\Migration;
+use Okvpn\Component\Migration\Tools\SafeDatabaseChecker;
 use Symfony\Component\EventDispatcher\Event;
-
-use Okvpn\Bundle\MigrationBundle\Migration\Migration;
 
 class MigrationEvent extends Event
 {

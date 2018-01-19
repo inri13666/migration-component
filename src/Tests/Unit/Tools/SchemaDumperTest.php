@@ -1,9 +1,9 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Tests\Unit\Tools;
+namespace Okvpn\Component\Migration\Tests\Unit\Tools;
 
 use Doctrine\DBAL\Schema\Schema;
-use Okvpn\Bundle\MigrationBundle\Tools\SchemaDumper;
+use Okvpn\Component\Migration\Tools\SchemaDumper;
 
 class SchemaDumperTest extends \PHPUnit_Framework_TestCase
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Tools;
+namespace Okvpn\Component\Migration\Tools;
 
 use Doctrine\DBAL\Schema\SchemaDiff;
 
 class SchemaDiffDumper
 {
-    const SCHEMA_TEMPLATE = '@OkvpnMigration/schema-diff-template.php.twig';
+    const SCHEMA_TEMPLATE = 'schema-diff-template.php.twig';
     const DEFAULT_CLASS_NAME = 'AllMigration';
     const DEFAULT_VERSION = 'v1_0';
 
@@ -49,6 +49,7 @@ class SchemaDiffDumper
      * @param string $className
      * @param string $version
      * @param array|null $extendedOptions
+     *
      * @return string
      */
     public function dump(
@@ -68,7 +69,7 @@ class SchemaDiffDumper
                 'className' => $className,
                 'version' => $version,
                 'extendedOptions' => $extendedOptions,
-                'migrationPath' => $migrationPath
+                'migrationPath' => $migrationPath,
             ]
         );
 

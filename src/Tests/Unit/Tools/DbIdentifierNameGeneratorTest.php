@@ -1,11 +1,11 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Tests\Unit\Tools;
+namespace Okvpn\Component\Migration\Tests\Unit\Tools;
 
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
-use Okvpn\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
+use Okvpn\Component\Migration\Tools\DbIdentifierNameGenerator;
 
 class DbIdentifierNameGeneratorTest extends \PHPUnit_Framework_TestCase
 {

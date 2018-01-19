@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Migration\Extension;
+namespace Okvpn\Component\Migration\Migration\Extension;
 
 /**
  * RenameExtensionAwareInterface should be implemented by migrations that depends on a RenameExtension.

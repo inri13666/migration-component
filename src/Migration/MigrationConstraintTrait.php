@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Migration;
+namespace Okvpn\Component\Migration\Migration;
 
 use Doctrine\DBAL\Schema\Table;
 
@@ -9,6 +9,7 @@ trait MigrationConstraintTrait
     /**
      * @param Table $table
      * @param string $columnName
+     *
      * @return string
      * @throws \LogicException
      */

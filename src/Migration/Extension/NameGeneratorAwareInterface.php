@@ -1,8 +1,8 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Migration\Extension;
+namespace Okvpn\Component\Migration\Migration\Extension;
 
-use Okvpn\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
+use Okvpn\Component\Migration\Tools\DbIdentifierNameGenerator;
 
 /**
  * NameGeneratorAwareInterface should be implemented by extensions that depends on a database identifier name generator.

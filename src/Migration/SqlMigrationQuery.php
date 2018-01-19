@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Migration;
+namespace Okvpn\Component\Migration\Migration;
 
 use Doctrine\DBAL\Connection;
 use Psr\Log\LoggerInterface;
@@ -19,6 +19,7 @@ class SqlMigrationQuery implements MigrationQuery, ConnectionAwareInterface
 
     /**
      * @param string|string[] $sql
+     *
      * @throws \InvalidArgumentException if $sql is empty
      */
     public function __construct($sql = null)
@@ -28,7 +29,7 @@ class SqlMigrationQuery implements MigrationQuery, ConnectionAwareInterface
         } elseif (is_array($sql)) {
             $this->queries = $sql;
         } else {
-            $this->queries   = [];
+            $this->queries = [];
             $this->queries[] = $sql;
         }
     }

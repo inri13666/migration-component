@@ -1,10 +1,10 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Tests\Unit\Migration;
+namespace Okvpn\Component\Migration\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
-use Okvpn\Bundle\MigrationBundle\Migration\CreateMigrationTableMigration;
-use Okvpn\Bundle\MigrationBundle\Migration\QueryBag;
+use Okvpn\Component\Migration\Migration\CreateMigrationTableMigration;
+use Okvpn\Component\Migration\Migration\QueryBag;
 
 class CreateMigrationTableMigrationTest extends \PHPUnit_Framework_TestCase
 {

@@ -1,17 +1,17 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Command;
+namespace Okvpn\Component\Migration\Command;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Mapping\ClassMetadata;
-
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Okvpn\Component\Migration\Command\Helper\MigrationConsoleHelper;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class DumpMigrationsCommand extends ContainerAwareCommand
+class DumpMigrationsCommand extends Command
 {
     /**
      * @var array
@@ -46,10 +46,18 @@ class DumpMigrationsCommand extends ContainerAwareCommand
         $this->setName('okvpn:migration:dump')
             ->addOption('plain-sql', null, InputOption::VALUE_NONE, 'Out schema as plain sql queries')
             ->addOption(
-                'bundle',
+                'namespace',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Entities Namespace',
+                null
+            )
+            ->addOption(
+                'class-name',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Bundle name for which migration wll be generated'
+                'Class Name',
+                null
             )
             ->addOption(
                 'migration-version',
@@ -62,20 +70,29 @@ class DumpMigrationsCommand extends ContainerAwareCommand
     }
 
     /**
+     * @return MigrationConsoleHelper
+     */
+    protected function getOkvpnMigrationHelper()
+    {
+        return $this->getHelper(MigrationConsoleHelper::NAME);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $this->version = $input->getOption('migration-version');
-        $this->initializeBundleRestrictions($input->getOption('bundle'));
+        $this->namespace = $input->getOption('namespace');
+        $this->className = $input->getOption('class-name') ?: 'Installer';
         $this->initializeMetadataInformation();
-        $doctrine = $this->getContainer()->get('doctrine');
+        $doctrine = $this->getOkvpnMigrationHelper()->getDoctrine();
+        /** @var Connection $connection */
+        $connection = $doctrine->getConnection();
         /** @var Schema $schema */
-        $schema = $doctrine->getConnection()->getSchemaManager()->createSchema();
+        $schema = $connection->getSchemaManager()->createSchema();
 
         if ($input->getOption('plain-sql')) {
-            /** @var Connection $connection */
-            $connection = $this->getContainer()->get('doctrine')->getConnection();
             $sqls = $schema->toSql($connection->getDatabasePlatform());
             foreach ($sqls as $sql) {
                 $output->writeln($sql . ';');
@@ -86,64 +103,43 @@ class DumpMigrationsCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param string $bundle
-     */
-    protected function initializeBundleRestrictions($bundle)
-    {
-        if ($bundle) {
-            $bundles = $this->getContainer()->getParameter('kernel.bundles');
-            if (!array_key_exists($bundle, $bundles)) {
-                throw new \InvalidArgumentException(
-                    sprintf('Bundle "%s" is not a known bundle', $bundle)
-                );
-            }
-            $this->namespace = str_replace($bundle, 'Entity', $bundles[$bundle]);
-            $this->className = $bundle . 'Installer';
-        }
-    }
-
-    /**
      * Process metadata information.
      */
     protected function initializeMetadataInformation()
     {
-        $doctrine = $this->getContainer()->get('doctrine');
+        $doctrine = $this->getOkvpnMigrationHelper()->getDoctrine();
         /** @var ClassMetadata[] $allMetadata */
-        $allMetadata = $doctrine->getManager()->getMetadataFactory()->getAllMetadata();
+        $allMetadata = $doctrine->getMetadataFactory()->getAllMetadata();
         array_walk(
             $allMetadata,
             function (ClassMetadata $entityMetadata) {
-                if ($this->namespace) {
-                    if ($entityMetadata->namespace == $this->namespace) {
-                        $this->allowedTables[$entityMetadata->getTableName()] = true;
-                        foreach ($entityMetadata->getAssociationMappings() as $associationMappingInfo) {
-                            if (!empty($associationMappingInfo['joinTable'])) {
-                                $joinTableName = $associationMappingInfo['joinTable']['name'];
-                                $this->allowedTables[$joinTableName] = true;
-                            }
-                        }
-                        //$this->initializeExtendedFieldsOptions($entityMetadata);
+                if (($this->namespace) && ($entityMetadata->namespace != $this->namespace)) {
+                    return;
+                }
+                $this->allowedTables[$entityMetadata->getTableName()] = true;
+                foreach ($entityMetadata->getAssociationMappings() as $associationMappingInfo) {
+                    if (!empty($associationMappingInfo['joinTable'])) {
+                        $joinTableName = $associationMappingInfo['joinTable']['name'];
+                        $this->allowedTables[$joinTableName] = true;
                     }
-                } else {
-                    //$this->initializeExtendedFieldsOptions($entityMetadata);
                 }
             }
         );
     }
 
     /**
-     * @param Schema          $schema
+     * @param Schema $schema
      * @param OutputInterface $output
      */
     protected function dumpPhpSchema(Schema $schema, OutputInterface $output)
     {
-        $visitor = $this->getContainer()->get('okvpn_migration.tools.schema_dumper');
+        $visitor = $this->getOkvpnMigrationHelper()->getSchemaDumper();
         $schema->visit($visitor);
 
         $output->writeln(
             $visitor->dump(
                 $this->allowedTables,
-                $this->namespace,
+                $this->namespace ?: 'Okvpn',
                 $this->className,
                 $this->version,
                 $this->extendedFieldOptions

@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Tools;
+namespace Okvpn\Component\Migration\Tools;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
@@ -20,7 +20,7 @@ class SafeDatabaseChecker
     /**
      * Checks whether a database connection can be established and all given tables exist in the database.
      *
-     * @param Connection           $connection
+     * @param Connection $connection
      * @param string[]|string|null $tables
      *
      * @return bool
@@ -44,7 +44,7 @@ class SafeDatabaseChecker
      * Returns the table name for a given entity.
      *
      * @param ManagerRegistry $doctrine
-     * @param string          $entityName
+     * @param string $entityName
      *
      * @return string|null the table name or NULL if it cannot be determined
      */

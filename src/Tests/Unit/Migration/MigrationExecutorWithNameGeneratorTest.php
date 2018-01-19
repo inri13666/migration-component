@@ -1,13 +1,13 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Tests\Unit\Migration;
+namespace Okvpn\Component\Migration\Tests\Unit\Migration;
 
-use Okvpn\Bundle\MigrationBundle\Migration\MigrationExecutorWithNameGenerator;
-use Okvpn\Bundle\MigrationBundle\Migration\MigrationState;
-use Okvpn\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
-use Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle\Migrations\Schema;
-use Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\WrongTableNameMigration;
-use Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\WrongColumnNameMigration;
+use Okvpn\Component\Migration\Migration\MigrationExecutorWithNameGenerator;
+use Okvpn\Component\Migration\Migration\MigrationState;
+use Okvpn\Component\Migration\Tools\DbIdentifierNameGenerator;
+use Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\Test1Bundle\Migrations\Schema;
+use Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\WrongTableNameMigration;
+use Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\WrongColumnNameMigration;
 
 class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecutor
 {
@@ -100,11 +100,11 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
         ];
         $this->expectException('\RuntimeException');
         $this->expectExceptionMessage(
-            'Failed migrations: Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\WrongTableNameMigration.'
+            'Failed migrations: Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\WrongTableNameMigration.'
         );
         $this->executor->executeUp($migrations);
         $this->assertEquals(
-            '> Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\WrongTableNameMigration',
+            '> Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\WrongTableNameMigration',
             $this->logger->getMessages()[0]
         );
         $this->assertEquals(
@@ -126,11 +126,11 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
         ];
         $this->expectException('\RuntimeException');
         $this->expectExceptionMessage(
-            'Failed migrations: Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\WrongColumnNameMigration.'
+            'Failed migrations: Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\WrongColumnNameMigration.'
         );
         $this->executor->executeUp($migrations);
         $this->assertEquals(
-            '> Okvpn\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\WrongColumnNameMigration',
+            '> Okvpn\Component\Migration\Tests\Unit\Fixture\TestPackage\WrongColumnNameMigration',
             $this->logger->getMessages()[0]
         );
         $this->assertEquals(

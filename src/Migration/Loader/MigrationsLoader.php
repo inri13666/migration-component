@@ -1,44 +1,31 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Migration\Loader;
+namespace Okvpn\Component\Migration\Migration\Loader;
 
 use Doctrine\DBAL\Connection;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Okvpn\Component\Migration\Event\MigrationEvents;
+use Okvpn\Component\Migration\Event\PostMigrationEvent;
+use Okvpn\Component\Migration\Event\PreMigrationEvent;
+use Okvpn\Component\Migration\Migration\CreateMigrationTableMigration;
+use Okvpn\Component\Migration\Migration\Installation;
+use Okvpn\Component\Migration\Migration\MigrationState;
+use Okvpn\Component\Migration\Migration\OrderedMigrationInterface;
+use Okvpn\Component\Migration\Migration\UpdateBundleVersionMigration;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-
-use Okvpn\Bundle\MigrationBundle\Migration\MigrationState;
-use Okvpn\Bundle\MigrationBundle\Migration\Installation;
-use Okvpn\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
-use Okvpn\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration;
-use Okvpn\Bundle\MigrationBundle\Event\MigrationEvents;
-use Okvpn\Bundle\MigrationBundle\Event\PostMigrationEvent;
-use Okvpn\Bundle\MigrationBundle\Event\PreMigrationEvent;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class MigrationsLoader
 {
-    /**
-     * @var KernelInterface
-     *
-     */
-    protected $kernel;
+    const DEFAULT_MIGRATION_PATH = 'Migrations/Schema';
 
     /**
      * @var Connection
      */
     protected $connection;
-
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
 
     /**
      * @var EventDispatcherInterface
@@ -53,47 +40,30 @@ class MigrationsLoader
     protected $loadedVersions;
 
     /**
-     * @var array An array with bundles we must work from
-     */
-    protected $bundles;
-
-    /**
-     * @var array An array with excluded bundles
-     */
-    protected $excludeBundles;
-
-    /**
      * @var string Path that located migration files
      */
-    protected $migrationPath;
+    protected $migrationPath = self::DEFAULT_MIGRATION_PATH;
 
     /**
      * @var string Migration table
      */
-    protected $migrationTable;
+    protected $migrationTable = CreateMigrationTableMigration::MIGRATION_TABLE;
 
     /**
-     * @param KernelInterface          $kernel
-     * @param Connection               $connection
-     * @param ContainerInterface       $container
+     * @var array
+     */
+    protected $bundles = [];
+
+    /**
+     * @param Connection $connection
      * @param EventDispatcherInterface $eventDispatcher
-     * @param string                   $migrationPath
-     * @param string                   $migrationTable
      */
     public function __construct(
-        KernelInterface $kernel,
         Connection $connection,
-        ContainerInterface $container,
-        EventDispatcherInterface $eventDispatcher,
-        string $migrationPath,
-        string $migrationTable
+        EventDispatcherInterface $eventDispatcher
     ) {
-        $this->kernel          = $kernel;
-        $this->connection      = $connection;
-        $this->container       = $container;
+        $this->connection = $connection;
         $this->eventDispatcher = $eventDispatcher;
-        $this->migrationTable  = $migrationTable;
-        $this->migrationPath   = $migrationPath;
     }
 
     /**
@@ -105,17 +75,42 @@ class MigrationsLoader
     }
 
     /**
-     * @param array $excludeBundles
+     * @param string $name
+     * @param string $path
      */
-    public function setExcludeBundles(array $excludeBundles)
+    public function addBundle($name, $path)
     {
-        $this->excludeBundles = $excludeBundles;
+        $this->bundles[$name] = $path;
+    }
+
+    /**
+     * @param string $migrationPath
+     *
+     * @return $this
+     */
+    public function setMigrationPath($migrationPath)
+    {
+        $this->migrationPath = $migrationPath;
+
+        return $this;
+    }
+
+    /**
+     * @param string $migrationTable
+     *
+     * @return $this
+     */
+    public function setMigrationTable($migrationTable)
+    {
+        $this->migrationTable = $migrationTable;
+
+        return $this;
     }
 
     /**
      * @return MigrationState[]
      */
-    public function getMigrations(): array
+    public function getMigrations()
     {
         $result = [];
 
@@ -130,7 +125,9 @@ class MigrationsLoader
 
         // process main migrations
         $migrationDirectories = $this->getMigrationDirectories();
+
         $this->filterMigrations($migrationDirectories);
+
         $this->createMigrationObjects(
             $result,
             $this->loadMigrationScripts($migrationDirectories)
@@ -152,7 +149,7 @@ class MigrationsLoader
     /**
      * @return MigrationState[]
      */
-    public function getPlainMigrations(): array
+    public function getPlainMigrations()
     {
         $result = [];
 
@@ -200,14 +197,15 @@ class MigrationsLoader
     {
         $result = [];
 
-        $bundles = $this->getBundleList();
-        foreach ($bundles as $bundleName => $bundle) {
-            $bundlePath          = $bundle->getPath();
+        foreach ($this->bundles as $bundleName => $bundlePath) {
+
             $bundleMigrationPath = str_replace(
                 '/',
                 DIRECTORY_SEPARATOR,
                 $bundlePath . '/' . $this->migrationPath
             );
+
+            $bundleMigrationPath = rtrim($bundleMigrationPath, DIRECTORY_SEPARATOR);
 
             if (is_dir($bundleMigrationPath)) {
                 $bundleMigrationDirectories = [];
@@ -219,6 +217,7 @@ class MigrationsLoader
                 foreach ($finder as $directory) {
                     $bundleMigrationDirectories[$directory->getRelativePathname()] = $directory->getPathname();
                 }
+
                 // add root migration directory (it may contains an installation script)
                 $bundleMigrationDirectories[''] = $bundleMigrationPath;
                 // sort them by version number (the oldest version first)
@@ -283,7 +282,7 @@ class MigrationsLoader
         return [
             'migrations' => $migrations,
             'installers' => $installers,
-            'bundles'    => array_keys($migrationDirectories),
+            'bundles' => array_keys($migrationDirectories),
         ];
     }
 
@@ -291,7 +290,7 @@ class MigrationsLoader
      * Creates an instances of all classes implement migration scripts
      *
      * @param MigrationState[] $result
-     * @param array            $files Files contain migration scripts
+     * @param array $files Files contain migration scripts
      *                                'migrations' => array
      *                                .      key   = full file path
      *                                .      value = array
@@ -312,7 +311,7 @@ class MigrationsLoader
         // remove versioned migrations covered by installers
         foreach ($installers as $installer) {
             $installerBundleName = $installer['bundleName'];
-            $installerVersion    = $installer['version'];
+            $installerVersion = $installer['version'];
             foreach ($files['migrations'] as $sourceFile => $migration) {
                 if ($migration['bundleName'] === $installerBundleName
                     && version_compare($migration['version'], $installerVersion) < 1
@@ -332,7 +331,7 @@ class MigrationsLoader
                 if ($installerBundleName === $bundleName && isset($migrations[$sourceFile])) {
                     /** @var Installation $installer */
                     $installer = $migrations[$sourceFile];
-                    $result[]  = new MigrationState(
+                    $result[] = new MigrationState(
                         $installer,
                         $installerBundleName,
                         $installer->getMigrationVersion()
@@ -343,7 +342,7 @@ class MigrationsLoader
             if (isset($groupedMigrations[$bundleName])) {
                 foreach ($groupedMigrations[$bundleName] as $version => $versionedMigrations) {
                     foreach ($versionedMigrations as $migration) {
-                        $result[]  = new MigrationState(
+                        $result[] = new MigrationState(
                             $migration,
                             $bundleName,
                             $version
@@ -369,7 +368,7 @@ class MigrationsLoader
         foreach ($files['migrations'] as $sourceFile => $migration) {
             if (isset($migrations[$sourceFile])) {
                 $bundleName = $migration['bundleName'];
-                $version    = $migration['version'];
+                $version = $migration['version'];
                 if (!isset($groupedMigrations[$bundleName])) {
                     $groupedMigrations[$bundleName] = [];
                 }
@@ -412,7 +411,6 @@ class MigrationsLoader
         return $groupedMigrations;
     }
 
-
     /**
      * Loads migration objects
      *
@@ -425,36 +423,32 @@ class MigrationsLoader
     {
         $migrations = [];
         $installers = [];
-        $declared   = get_declared_classes();
+        $declared = get_declared_classes();
 
         foreach ($declared as $className) {
-            $reflClass  = new \ReflectionClass($className);
+            $reflClass = new \ReflectionClass($className);
             $sourceFile = $reflClass->getFileName();
             if (isset($files['migrations'][$sourceFile])) {
-                if (is_subclass_of($className, 'Okvpn\Bundle\MigrationBundle\Migration\Migration')) {
+                if (is_subclass_of($className, 'Okvpn\Component\Migration\Migration\Migration')) {
                     $migration = new $className;
                     if (isset($migrations[$sourceFile])) {
                         throw new \RuntimeException('A migration script must contains only one class.');
                     }
-                    if ($migration instanceof ContainerAwareInterface) {
-                        $migration->setContainer($this->container);
-                    }
+
                     $migrations[$sourceFile] = $migration;
                 }
             } elseif (isset($files['installers'][$sourceFile])) {
-                if (is_subclass_of($className, 'Okvpn\Bundle\MigrationBundle\Migration\Installation')) {
-                    /** @var \Okvpn\Bundle\MigrationBundle\Migration\Installation $installer */
+                if (is_subclass_of($className, 'Okvpn\Component\Migration\Migration\Installation')) {
+                    /** @var \Okvpn\Component\Migration\Migration\Installation $installer */
                     $installer = new $className;
                     if (isset($migrations[$sourceFile])) {
                         throw new \RuntimeException('An installation  script must contains only one class.');
                     }
-                    if ($installer instanceof ContainerAwareInterface) {
-                        $installer->setContainer($this->container);
-                    }
+
                     $migrations[$sourceFile] = $installer;
                     $installers[$sourceFile] = [
                         'bundleName' => $files['installers'][$sourceFile],
-                        'version'    => $installer->getMigrationVersion(),
+                        'version' => $installer->getMigrationVersion(),
                     ];
                 }
             }
@@ -462,10 +456,9 @@ class MigrationsLoader
 
         return [
             $migrations,
-            $installers
+            $installers,
         ];
     }
-
 
     /**
      * Removes already installed migrations
@@ -492,29 +485,5 @@ class MigrationsLoader
                 }
             }
         }
-    }
-
-    /**
-     * @return BundleInterface[] key = bundle name
-     */
-    protected function getBundleList()
-    {
-        $bundles = $this->kernel->getBundles();
-        if (!empty($this->bundles)) {
-            $includedBundles = [];
-            foreach ($this->bundles as $bundleName) {
-                if (isset($bundles[$bundleName])) {
-                    $includedBundles[$bundleName] = $bundles[$bundleName];
-                }
-            }
-            $bundles = $includedBundles;
-        }
-        if (!empty($this->excludeBundles)) {
-            foreach ($this->excludeBundles as $excludeBundle) {
-                unset($bundles[$excludeBundle]);
-            }
-        }
-
-        return $bundles;
     }
 }

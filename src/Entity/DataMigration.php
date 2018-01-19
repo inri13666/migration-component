@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Entity;
+namespace Okvpn\Component\Migration\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 

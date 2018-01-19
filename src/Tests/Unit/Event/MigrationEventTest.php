@@ -1,8 +1,8 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Tests\Unit\Event;
+namespace Okvpn\Component\Migration\Tests\Unit\Event;
 
-use Okvpn\Bundle\MigrationBundle\Event\MigrationEvent;
+use Okvpn\Component\Migration\Event\MigrationEvent;
 
 class MigrationEventTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,11 +23,11 @@ class MigrationEventTest extends \PHPUnit_Framework_TestCase
 
     public function testMigrationData()
     {
-        $middleMigration = $this->getMockForAbstractClass('Okvpn\Bundle\MigrationBundle\Migration\Migration');
+        $middleMigration = $this->getMockForAbstractClass('Okvpn\Component\Migration\Migration\Migration');
         $this->migrationEvent->addMigration($middleMigration);
-        $firstMigration = $this->getMockForAbstractClass('Okvpn\Bundle\MigrationBundle\Migration\Migration');
+        $firstMigration = $this->getMockForAbstractClass('Okvpn\Component\Migration\Migration\Migration');
         $this->migrationEvent->addMigration($firstMigration, true);
-        $lastMigration = $this->getMockForAbstractClass('Okvpn\Bundle\MigrationBundle\Migration\Migration');
+        $lastMigration = $this->getMockForAbstractClass('Okvpn\Component\Migration\Migration\Migration');
         $this->migrationEvent->addMigration($lastMigration);
 
         $migrations = $this->migrationEvent->getMigrations();

@@ -1,8 +1,6 @@
 <?php
 
-declare(strict_types = 1);
-
-namespace Okvpn\Bundle\MigrationBundle\Migration;
+namespace Okvpn\Component\Migration\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
 
@@ -18,7 +16,7 @@ class UpdateBundleVersionMigration implements Migration, FailIndependentMigratio
      * @param MigrationState[] $migrations
      * @param string $migrationTable
      */
-    public function __construct(array $migrations, string $migrationTable = null)
+    public function __construct(array $migrations, $migrationTable = null)
     {
         $this->migrations = $migrations;
         $this->migrationTable = $migrationTable ? $migrationTable : CreateMigrationTableMigration::MIGRATION_TABLE;

@@ -1,10 +1,11 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Migration;
+namespace Okvpn\Component\Migration\Migration;
 
-use Okvpn\Bundle\MigrationBundle\Exception\InvalidNameException;
-use Okvpn\Bundle\MigrationBundle\Migration\Schema\SchemaWithNameGenerator;
-use Okvpn\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
+use Doctrine\DBAL\Schema\SchemaConfig;
+use Okvpn\Component\Migration\Exception\InvalidNameException;
+use Okvpn\Component\Migration\Migration\Schema\SchemaWithNameGenerator;
+use Okvpn\Component\Migration\Tools\DbIdentifierNameGenerator;
 
 class MigrationExecutorWithNameGenerator extends MigrationExecutor
 {
@@ -38,7 +39,7 @@ class MigrationExecutorWithNameGenerator extends MigrationExecutor
     /**
      * {@inheritdoc}
      */
-    protected function createSchemaObject(array $tables = [], array $sequences = [], $schemaConfig = null)
+    protected function createSchemaObject(array $tables = [], array $sequences = [], SchemaConfig $schemaConfig = null)
     {
         if ($schemaConfig && $this->nameGenerator) {
             $schemaConfig->setMaxIdentifierLength($this->nameGenerator->getMaxIdentifierSize());

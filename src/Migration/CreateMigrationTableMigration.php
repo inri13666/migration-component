@@ -1,8 +1,6 @@
 <?php
 
-declare(strict_types = 1);
-
-namespace Okvpn\Bundle\MigrationBundle\Migration;
+namespace Okvpn\Component\Migration\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
 
@@ -18,7 +16,7 @@ class CreateMigrationTableMigration implements Migration
     /**
      * @param null|string $migrationTable
      */
-    public function __construct(string $migrationTable = null)
+    public function __construct($migrationTable = null)
     {
         if ($migrationTable !== null) {
             $this->migrationTable = $migrationTable;

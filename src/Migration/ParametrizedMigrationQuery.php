@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Migration;
+namespace Okvpn\Component\Migration\Migration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
@@ -25,9 +25,9 @@ abstract class ParametrizedMigrationQuery implements MigrationQuery, ConnectionA
      * Adds a query to a log
      *
      * @param LoggerInterface $logger
-     * @param string          $query
-     * @param array           $params
-     * @param array           $types
+     * @param string $query
+     * @param array $params
+     * @param array $types
      */
     protected function logQuery(LoggerInterface $logger, $query, array $params = [], array $types = [])
     {
@@ -60,12 +60,12 @@ abstract class ParametrizedMigrationQuery implements MigrationQuery, ConnectionA
         if (is_int(key($params))) {
             // Positional parameters
             $typeOffset = array_key_exists(0, $types) ? -1 : 0;
-            $bindIndex  = 1;
+            $bindIndex = 1;
             foreach ($params as $value) {
                 $typeIndex = $bindIndex + $typeOffset;
                 if (isset($types[$typeIndex])) {
-                    $type                       = $types[$typeIndex];
-                    $value                      = $this->convertToDatabaseValue($value, $type);
+                    $type = $types[$typeIndex];
+                    $value = $this->convertToDatabaseValue($value, $type);
                     $resolvedParams[$bindIndex] = $value;
                 } else {
                     $resolvedParams[$bindIndex] = $value;
@@ -76,8 +76,8 @@ abstract class ParametrizedMigrationQuery implements MigrationQuery, ConnectionA
             // Named parameters
             foreach ($params as $name => $value) {
                 if (isset($types[$name])) {
-                    $type                  = $types[$name];
-                    $value                 = $this->convertToDatabaseValue($value, $type);
+                    $type = $types[$name];
+                    $value = $this->convertToDatabaseValue($value, $type);
                     $resolvedParams[$name] = $value;
                 } else {
                     $resolvedParams[$name] = $value;
@@ -91,7 +91,7 @@ abstract class ParametrizedMigrationQuery implements MigrationQuery, ConnectionA
     /**
      * Converts a value from its PHP representation to its database representation.
      *
-     * @param mixed       $value
+     * @param mixed $value
      * @param string|Type $type
      *
      * @return array the (escaped) value

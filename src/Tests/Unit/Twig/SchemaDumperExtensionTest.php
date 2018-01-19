@@ -1,12 +1,12 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Tests\Unit\Tools;
+namespace Okvpn\Component\Migration\Tests\Unit\Tools;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\Type;
 
-use Okvpn\Bundle\MigrationBundle\Twig\SchemaDumperExtension;
+use Okvpn\Component\Migration\Twig\SchemaDumperExtension;
 
 class SchemaDumperExtensionTest extends \PHPUnit_Framework_TestCase
 {

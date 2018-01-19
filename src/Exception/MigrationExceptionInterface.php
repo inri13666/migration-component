@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Bundle\MigrationBundle\Exception;
+namespace Okvpn\Component\Migration\Exception;
 
 interface MigrationExceptionInterface extends \Throwable
 {
