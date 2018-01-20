@@ -2,9 +2,13 @@
 
 namespace Okvpn\Component\Migration\Command\Helper;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Okvpn\Component\Migration\Entity\DataMigration;
 use Okvpn\Component\Migration\Event\MigrationEvents;
 use Okvpn\Component\Migration\Event\PreMigrationEvent;
 use Okvpn\Component\Migration\EventListener\DoctrineMetadataListener;
@@ -102,6 +106,23 @@ class MigrationConsoleHelper extends Helper
             Events::loadClassMetadata,
             new DoctrineMetadataListener($this->migrationTable)
         );
+
+        $metaDriver = $this->doctrine->getConfiguration()->getMetadataDriverImpl();
+
+        if (!$metaDriver instanceof MappingDriverChain) {
+            $metaDriverChain = new MappingDriverChain();
+            $metaDriverChain->setDefaultDriver($metaDriver);
+        } else {
+            $metaDriverChain = $metaDriver;
+        }
+
+        $namespace = 'Okvpn\Component\Migration\Entity';
+        if (!in_array($namespace, $metaDriverChain->getAllClassNames())) {
+            $reflection = new \ReflectionClass(DataMigration::class);
+            $metaDriverChain->addDriver(
+                new AnnotationDriver(new AnnotationReader(), [dirname($reflection->getFileName())]), $namespace
+            );
+        }
     }
 
     /**
