@@ -16,6 +16,7 @@ use Okvpn\Component\Migration\EventListener\PreUpMigrationListener;
 use Okvpn\Component\Migration\Migration\CreateMigrationTableMigration;
 use Okvpn\Component\Migration\Migration\Extension\DataStorageExtension;
 use Okvpn\Component\Migration\Migration\Extension\RenameExtension;
+use Okvpn\Component\Migration\Migration\Loader\LegacyMigrationsLoader;
 use Okvpn\Component\Migration\Migration\Loader\MigrationsLoader;
 use Okvpn\Component\Migration\Migration\MigrationExecutor;
 use Okvpn\Component\Migration\Migration\MigrationExecutorWithNameGenerator;
@@ -61,6 +62,12 @@ class MigrationConsoleHelper extends Helper
 
     /** @var MigrationExtensionManager */
     protected $migrationExtensionManager;
+
+    /** @var string */
+    protected $dir;
+
+    /** @var LegacyMigrationsLoader */
+    protected $legacyMigrationsLoader;
 
     /**
      * @param \Twig_Environment $twig
@@ -134,6 +141,18 @@ class MigrationConsoleHelper extends Helper
     }
 
     /**
+     * @param string $dir
+     *
+     * @return $this
+     */
+    public function setDir($dir)
+    {
+        $this->dir = $dir;
+
+        return $this;
+    }
+
+    /**
      * @return EntityManagerInterface
      */
     public function getDoctrine()
@@ -182,6 +201,24 @@ class MigrationConsoleHelper extends Helper
         }
 
         return $this->migrationsLoader;
+    }
+
+    /**
+     * @return LegacyMigrationsLoader
+     */
+    public function getLegacyMigrationLoader()
+    {
+        if (!$this->legacyMigrationsLoader) {
+            $this->legacyMigrationsLoader = new LegacyMigrationsLoader(
+                $this->getDoctrine()->getConnection(),
+                $this->eventDispatcher
+            );
+            $this->legacyMigrationsLoader
+                ->setMigrationPath($this->migrationPath)
+                ->setMigrationTable($this->migrationTable);
+        }
+
+        return $this->legacyMigrationsLoader;
     }
 
     /**
@@ -237,5 +274,30 @@ class MigrationConsoleHelper extends Helper
     protected function getTwig()
     {
         return $this->twig;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMigrationDirectory()
+    {
+        $dir = $this->dir;
+        $dir = $dir ? $dir : getcwd();
+        $dir = rtrim($dir, '/');
+
+        if (!file_exists($dir)) {
+            throw new \InvalidArgumentException(sprintf('Migrations directory "%s" does not exist.', $dir));
+        }
+
+        $this->createDirIfNotExists($dir);
+
+        return $dir;
+    }
+
+    private function createDirIfNotExists($dir)
+    {
+        if (!file_exists($dir)) {
+            mkdir($dir, 0755, true);
+        }
     }
 }

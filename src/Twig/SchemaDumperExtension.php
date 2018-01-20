@@ -78,6 +78,7 @@ class SchemaDumperExtension extends \Twig_Extension
 
         $comment = $column->getComment();
         if ($platform && $platform->isCommentedDoctrineType($column->getType())) {
+            file_put_contents('c:/uuu/yahoo.txt', var_export([$comment, $column->getType(), $platform->getDoctrineTypeComment($column->getType())], true), FILE_APPEND);
             $comment .= $platform->getDoctrineTypeComment($column->getType());
         }
         if (!empty($comment)) {

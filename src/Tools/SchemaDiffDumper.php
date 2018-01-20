@@ -25,6 +25,9 @@ class SchemaDiffDumper
      */
     protected $migrationPath;
 
+    /** @var string */
+    protected $template = self::SCHEMA_TEMPLATE;
+
     /**
      * @param \Twig_Environment $twig
      * @param string $migrationPath
@@ -33,6 +36,18 @@ class SchemaDiffDumper
     {
         $this->twig = $twig;
         $this->migrationPath = $migrationPath;
+    }
+
+    /**
+     * @param string $template
+     *
+     * @return $this
+     */
+    public function setTemplate($template)
+    {
+        $this->template = $template;
+
+        return $this;
     }
 
     /**
@@ -61,7 +76,7 @@ class SchemaDiffDumper
     ) {
         $migrationPath = trim(preg_replace('/\//', '\\', $this->migrationPath), "\\");
         $content = $this->twig->render(
-            self::SCHEMA_TEMPLATE,
+            $this->template,
             [
                 'schema' => $this->schemaDiff,
                 'allowedTables' => $allowedTables,
