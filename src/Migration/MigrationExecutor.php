@@ -87,25 +87,10 @@ class MigrationExecutor
     {
         $platform = $this->queryExecutor->getConnection()->getDatabasePlatform();
         $schema = $this->getActualSchema();
-        $failedMigrations = false;
 
         foreach ($migrations as $item) {
             $migration = $item->getMigration();
-            if (!empty($failedMigrations) && !$migration instanceof FailIndependentMigration) {
-                $this->logger->info(sprintf('> %s - skipped', get_class($migration)));
-                continue;
-            }
-
-            if ($this->executeUpMigration($schema, $platform, $migration, $dryRun)) {
-                $item->setSuccessful();
-            } else {
-                $item->setFailed();
-                $failedMigrations[] = get_class($migration);
-            }
-        }
-
-        if (!empty($failedMigrations)) {
-            throw new \RuntimeException(sprintf('Failed migrations: %s.', implode(', ', $failedMigrations)));
+            $this->executeUpMigration($schema, $platform, $migration, $dryRun);
         }
     }
 
@@ -123,49 +108,42 @@ class MigrationExecutor
         Migration $migration,
         $dryRun = false
     ) {
-        $result = true;
-
         $this->logger->info(sprintf('> %s', get_class($migration)));
         $toSchema = clone $schema;
         $this->setExtensions($migration);
-        try {
-            $queryBag = new QueryBag();
-            $migration->up($toSchema, $queryBag);
+        $queryBag = new QueryBag();
+        $migration->up($toSchema, $queryBag);
 
-            $comparator = new Comparator();
-            $schemaDiff = $comparator->compare($schema, $toSchema);
+        $comparator = new Comparator();
+        $schemaDiff = $comparator->compare($schema, $toSchema);
 
-            $this->checkTables($schemaDiff, $migration);
-            $this->checkIndexes($schemaDiff, $migration);
+        $this->checkTables($schemaDiff, $migration);
+        $this->checkIndexes($schemaDiff, $migration);
 
-            $queries = array_merge(
-                $queryBag->getPreQueries(),
-                $schemaDiff->toSql($platform),
-                $queryBag->getPostQueries()
-            );
+        $queries = array_merge(
+            $queryBag->getPreQueries(),
+            $schemaDiff->toSql($platform),
+            $queryBag->getPostQueries()
+        );
 
-            $schema = $toSchema;
+        $schema = $toSchema;
 
-            $isSchemaUpdateRequired = false;
-            foreach ($queries as $query) {
-                $this->queryExecutor->execute($query, $dryRun);
-                if (is_object($query) && $query instanceof SchemaUpdateQuery) {
-                    // check if schema update required
-                    if (!$isSchemaUpdateRequired && $query->isUpdateRequired()) {
-                        $isSchemaUpdateRequired = true;
-                    }
+        $isSchemaUpdateRequired = false;
+        foreach ($queries as $query) {
+            $this->queryExecutor->execute($query, $dryRun);
+            if (is_object($query) && $query instanceof SchemaUpdateQuery) {
+                // check if schema update required
+                if (!$isSchemaUpdateRequired && $query->isUpdateRequired()) {
+                    $isSchemaUpdateRequired = true;
                 }
             }
-
-            if ($isSchemaUpdateRequired) {
-                $schema = $this->getActualSchema();
-            }
-        } catch (\Exception $ex) {
-            $result = false;
-            $this->logger->error(sprintf('  ERROR: %s', $ex->getMessage()));
         }
 
-        return $result;
+        if ($isSchemaUpdateRequired) {
+            $schema = $this->getActualSchema();
+        }
+
+        return true;
     }
 
     /**

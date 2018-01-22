@@ -1,7 +1,7 @@
 {% import _self as dmpr %}
 <?php
 
-namespace {{ namespace }}\{{ migrationPath }}\{{ version }};
+namespace {{ namespace }};
 
 use Doctrine\DBAL\Schema\Schema;
 use Okvpn\Component\Migration\Migration\Migration;
@@ -13,14 +13,6 @@ use Okvpn\Component\Migration\Migration\QueryBag;
  */
 class {{ className }} implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getMigrationVersion()
-    {
-        return '{{ version }}';
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -44,7 +36,6 @@ class {{ className }} implements Migration
 {% endif %}
 {% endfor %}
 {% endif %}
-
 {% if schema.changedTables|length %}
         /** Update Tables generation **/
 {% for table in schema.changedTables %}
@@ -143,8 +134,8 @@ class {{ className }} implements Migration
         );
 {% endfor %}
     }
-{% endif -%}
-{% endfor -%}
+{% endif %}
+{% endfor %}
 }{% spaceless %}
 
 {% macro dumpColumnOptions(column, columnExtendedOptions) %}

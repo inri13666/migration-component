@@ -34,7 +34,10 @@ class MigrationConsoleHelper extends Helper
     const NAME = 'okvpn_migrations';
 
     /** @var string */
-    protected $migrationPath;
+    protected $migrationNamespace;
+
+    /** @var null|string */
+    protected $migrationsFolder;
 
     /** @var string */
     protected $migrationTable;
@@ -48,9 +51,6 @@ class MigrationConsoleHelper extends Helper
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /** @var SchemaDumper */
-    protected $schemaDumper;
-
     /** @var SchemaDiffDumper */
     protected $schemaDiffDumper;
 
@@ -63,43 +63,30 @@ class MigrationConsoleHelper extends Helper
     /** @var MigrationExtensionManager */
     protected $migrationExtensionManager;
 
-    /** @var string */
-    protected $dir;
-
-    /** @var LegacyMigrationsLoader */
-    protected $legacyMigrationsLoader;
-
     /**
-     * @param \Twig_Environment $twig
      * @param EntityManager $em
      * @param EventDispatcherInterface $eventDispatcher
-     * @param string $migrationPath
+     * @param \Twig_Environment $twig
+     * @param string $migrationNamespace
+     * @param string $migrationsFolder
      * @param string $migrationTable
      *
-     * @throws \LogicException
+     * @throws \Doctrine\ORM\ORMException
      */
     public function __construct(
-        \Twig_Environment $twig,
         EntityManager $em,
         EventDispatcherInterface $eventDispatcher,
-        $migrationPath = MigrationsLoader::DEFAULT_MIGRATION_PATH,
+        \Twig_Environment $twig = null,
+        $migrationsFolder = null,
+        $migrationNamespace = MigrationsLoader::DEFAULT_MIGRATION_NAMESPACE,
         $migrationTable = CreateMigrationTableMigration::MIGRATION_TABLE
     ) {
-        $this->migrationPath = $migrationPath;
+        $this->migrationNamespace = $migrationNamespace;
+        $this->migrationsFolder = $migrationsFolder;
         $this->migrationTable = $migrationTable;
         $this->twig = $twig;
         $this->doctrine = $em;
         $this->eventDispatcher = $eventDispatcher;
-
-        //Configure Twig
-        $this->twig->addExtension(new SchemaDumperExtension($this->doctrine));
-        $reflected = new \ReflectionClass(__CLASS__);
-        $path = dirname($reflected->getFileName(), 3) . '/Resources/views';
-        $loader = $this->twig->getLoader();
-        $this->twig->setLoader(new \Twig_Loader_Chain(array(
-            new \Twig_Loader_Filesystem($path),
-            $loader,
-        )));
 
         //Configure Event Dispatcher
         $this->eventDispatcher->addListener(MigrationEvents::PRE_UP, function (PreMigrationEvent $event) {
@@ -141,35 +128,11 @@ class MigrationConsoleHelper extends Helper
     }
 
     /**
-     * @param string $dir
-     *
-     * @return $this
-     */
-    public function setDir($dir)
-    {
-        $this->dir = $dir;
-
-        return $this;
-    }
-
-    /**
      * @return EntityManagerInterface
      */
     public function getDoctrine()
     {
         return $this->doctrine;
-    }
-
-    /**
-     * @return SchemaDumper
-     */
-    public function getSchemaDumper()
-    {
-        if (!$this->schemaDumper) {
-            $this->schemaDumper = new SchemaDumper($this->getTwig(), $this->migrationPath);
-        }
-
-        return $this->schemaDumper;
     }
 
     /**
@@ -179,7 +142,7 @@ class MigrationConsoleHelper extends Helper
     {
 
         if (!$this->schemaDiffDumper) {
-            $this->schemaDiffDumper = new SchemaDiffDumper($this->getTwig(), $this->migrationPath);
+            $this->schemaDiffDumper = new SchemaDiffDumper($this->getTwig());
         }
 
         return $this->schemaDiffDumper;
@@ -196,29 +159,11 @@ class MigrationConsoleHelper extends Helper
                 $this->eventDispatcher
             );
             $this->migrationsLoader
-                ->setMigrationPath($this->migrationPath)
+                ->addBundle('Okvpn', $this->migrationsFolder)
                 ->setMigrationTable($this->migrationTable);
         }
 
         return $this->migrationsLoader;
-    }
-
-    /**
-     * @return LegacyMigrationsLoader
-     */
-    public function getLegacyMigrationLoader()
-    {
-        if (!$this->legacyMigrationsLoader) {
-            $this->legacyMigrationsLoader = new LegacyMigrationsLoader(
-                $this->getDoctrine()->getConnection(),
-                $this->eventDispatcher
-            );
-            $this->legacyMigrationsLoader
-                ->setMigrationPath($this->migrationPath)
-                ->setMigrationTable($this->migrationTable);
-        }
-
-        return $this->legacyMigrationsLoader;
     }
 
     /**
@@ -273,15 +218,26 @@ class MigrationConsoleHelper extends Helper
      */
     protected function getTwig()
     {
+        if (!$this->twig) {
+            //Configure Default Twig
+            $reflected = new \ReflectionClass(__CLASS__);
+            $path = dirname($reflected->getFileName(), 3) . '/Resources/views';
+            $loader = new \Twig_Loader_Chain(array(
+                new \Twig_Loader_Filesystem($path),
+            ));
+            $this->twig = new \Twig_Environment($loader);
+            $this->twig->addExtension(new SchemaDumperExtension($this->doctrine));
+        }
+
         return $this->twig;
     }
 
     /**
      * @return string
      */
-    public function getMigrationDirectory()
+    public function getMigrationsDirectory()
     {
-        $dir = $this->dir;
+        $dir = $this->migrationsFolder;
         $dir = $dir ? $dir : getcwd();
         $dir = rtrim($dir, '/');
 
@@ -289,6 +245,8 @@ class MigrationConsoleHelper extends Helper
             throw new \InvalidArgumentException(sprintf('Migrations directory "%s" does not exist.', $dir));
         }
 
+        $dir .= DIRECTORY_SEPARATOR . MigrationsLoader::DEFAULT_MIGRATION_PATH;
+        $dir = rtrim(str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $dir), DIRECTORY_SEPARATOR);
         $this->createDirIfNotExists($dir);
 
         return $dir;

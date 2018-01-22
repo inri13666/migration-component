@@ -24,26 +24,12 @@ class PreMigrationEvent extends MigrationEvent
     }
 
     /**
-     * Gets the latest version loaded version of the given bundle
-     *
-     * @param string $bundleName
-     * @return string|null
-     */
-    public function getLoadedVersion($bundleName)
-    {
-        return isset($this->loadedVersions[$bundleName])
-            ? $this->loadedVersions[$bundleName]
-            : null;
-    }
-
-    /**
      * Sets a number of already loaded version of the given bundle
      *
-     * @param string $bundleName
      * @param string $version
      */
-    public function setLoadedVersion($bundleName, $version)
+    public function addLoadedVersion($version)
     {
-        $this->loadedVersions[$bundleName] = $version;
+        $this->loadedVersions[] = $version;
     }
 }

@@ -31,8 +31,9 @@ class PreUpMigrationListener
                     $this->migrationTable
                 )
             );
+
             foreach ($data as $val) {
-                $event->setLoadedVersion($val['bundle'], $val['version']);
+                $event->addLoadedVersion($val['version']);
             }
         } else {
             $event->addMigration(new CreateMigrationTableMigration($this->migrationTable));

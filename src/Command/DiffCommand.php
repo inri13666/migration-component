@@ -1,6 +1,6 @@
 <?php
 
-namespace Okvpn\Component\Migration\Command\Legacy;
+namespace Okvpn\Component\Migration\Command;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Comparator;
@@ -17,44 +17,34 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DiffCommand extends Command
 {
     const NAME = 'akuma:migrations:diff';
 
-    /** @var \Twig_Environment */
-    protected $twig;
-
     /** @var EntityManager */
-    protected $doctrine;
-
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
+    private $doctrine;
 
     /** @var array */
-    protected $allowedTables;
+    private $allowedTables;
 
     /** @var MigrationSchemaProvider|SchemaProviderInterface */
-    protected $okvpnSchemaProvider;
+    private $okvpnSchemaProvider;
 
     /** @var OrmSchemaProvider|SchemaProviderInterface */
-    protected $schemaProvider;
+    private $schemaProvider;
+
+    /** @var MigrationConsoleHelper */
+    private $helper;
 
     /**
-     * @param \Twig_Environment|null $twig
-     * @param EntityManager|null $em
-     * @param EventDispatcherInterface|null $eventDispatcher
+     * @param MigrationConsoleHelper $helper
      */
-    public function __construct(
-        \Twig_Environment $twig = null,
-        EntityManager $em = null,
-        EventDispatcherInterface $eventDispatcher = null
-    ) {
+    public function __construct(MigrationConsoleHelper $helper = null)
+    {
         parent::__construct(self::NAME);
-        $this->twig = $twig;
-        $this->doctrine = $em;
-        $this->eventDispatcher = $eventDispatcher;
+
+        $this->helper = $helper;
     }
 
     /**
@@ -98,58 +88,48 @@ class DiffCommand extends Command
             }
         } else {
             $version = (new\DateTime())->format('YmdHis');
-            $migrationFile = sprintf('%s/Version%s.php', 'D:\_dev\sites\es436\server\app\Migrations\Schema', $version);
-            file_put_contents($migrationFile, $this->dumpPhpSchema($schemaDiff, 'Migrations\Schema', $version));
+            $migrationFile = sprintf(
+                '%s%sVersion%s.php',
+                $this->getOkvpnMigrationHelper()->getMigrationsDirectory(),
+                DIRECTORY_SEPARATOR,
+                $version
+            );
+            file_put_contents($migrationFile, $this->dumpPhpSchema($schemaDiff, $version));
             $output->writeln(
                 sprintf('Generated new migration class to "<info>%s</info>" from schema differences.', $migrationFile)
             );
         }
     }
 
-    /**
-     * @return \Twig_Environment
-     */
-    protected function getTwig()
-    {
-        if (!$this->twig) {
-            $this->twig = $this->getHelper(MigrationConsoleHelper::NAME)->getTwig();
-        }
 
-        return $this->twig;
+    /**
+     * @return MigrationConsoleHelper
+     */
+    protected function getOkvpnMigrationHelper()
+    {
+        return $this->helper ?: $this->getHelper(MigrationConsoleHelper::NAME);
     }
 
     /**
      * @return EntityManager
      */
-    protected function getDoctrine()
+    private function getDoctrine()
     {
         if (!$this->doctrine) {
-            $this->doctrine = $this->getHelper(MigrationConsoleHelper::NAME)->getDoctrine();
+            $this->doctrine = $this->getOkvpnMigrationHelper()->getDoctrine();
         }
 
         return $this->doctrine;
     }
 
     /**
-     * @return EventDispatcherInterface
-     */
-    protected function getEventDispatcher()
-    {
-        if (!$this->eventDispatcher) {
-            $this->eventDispatcher = $this->getHelper(MigrationConsoleHelper::NAME)->getEventDispatcher();
-        }
-
-        return $this->eventDispatcher;
-    }
-
-    /**
      * @return MigrationSchemaProvider|SchemaProviderInterface
      */
-    protected function getOkvpnSchemaProvider()
+    private function getOkvpnSchemaProvider()
     {
         if (!$this->okvpnSchemaProvider) {
             /** @var MigrationsLoader $loader */
-            $loader = $this->getHelper(MigrationConsoleHelper::NAME)->getLegacyMigrationLoader();
+            $loader = $this->getOkvpnMigrationHelper()->getMigrationLoader();
             $this->okvpnSchemaProvider = new MigrationSchemaProvider($loader);
         }
 
@@ -159,7 +139,7 @@ class DiffCommand extends Command
     /**
      * @return OrmSchemaProvider|SchemaProviderInterface
      */
-    protected function getSchemaProvider()
+    private function getSchemaProvider()
     {
         if (!$this->schemaProvider) {
             $this->schemaProvider = new OrmSchemaProvider($this->getDoctrine());
@@ -171,7 +151,7 @@ class DiffCommand extends Command
     /**
      * Process metadata information.
      */
-    protected function initializeMetadataInformation()
+    private function initializeMetadataInformation()
     {
         $doctrine = $this->getDoctrine();
         /** @var ClassMetadata[] $allMetadata */
@@ -197,19 +177,22 @@ class DiffCommand extends Command
      *
      * @return string
      */
-    protected function dumpPhpSchema(SchemaDiff $schema, $namespace, $version)
-    {
+    private function dumpPhpSchema(
+        SchemaDiff $schema,
+        $version,
+        $namespace = MigrationsLoader::DEFAULT_MIGRATION_NAMESPACE
+    ) {
         /** @var SchemaDiffDumper $visitor */
-        $visitor = $this->getHelper(MigrationConsoleHelper::NAME)->getSchemaDiffDumper();
-        $visitor->setTemplate('schema-diff-legacy-template.php.twig');
+        $visitor = $this->getOkvpnMigrationHelper()->getSchemaDiffDumper();
+        $visitor->setTemplate('schema-diff-template.php.twig');
         $visitor->acceptSchemaDiff($schema);
 
         return $visitor->dump(
-            $this->allowedTables,
-            $namespace,
-            sprintf('Version%s', $version),
             $version,
-            null
+            $this->allowedTables,
+            null,
+            sprintf('Version%s', $version),
+            $namespace
         );
     }
 }

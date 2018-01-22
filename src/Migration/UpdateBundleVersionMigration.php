@@ -27,45 +27,16 @@ class UpdateBundleVersionMigration implements Migration, FailIndependentMigratio
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $bundleVersions = $this->getLatestSuccessMigrationVersions();
-        if (!empty($bundleVersions)) {
-            $date = new \DateTime();
-            foreach ($bundleVersions as $bundleName => $bundleVersion) {
-                $sql = sprintf(
-                    "INSERT INTO %s (bundle, version, loaded_at) VALUES ('%s', '%s', '%s')",
-                    $this->migrationTable,
-                    $bundleName,
-                    $bundleVersion,
-                    $date->format('Y-m-d H:i:s')
-                );
-                $queries->addQuery($sql);
-            }
-        }
-    }
-
-    /**
-     * Extracts latest version of successfully finished migrations for each bundle
-     *
-     * @return string[]
-     *      key   = bundle name
-     *      value = version
-     */
-    protected function getLatestSuccessMigrationVersions()
-    {
-        $result = [];
+        $date = new \DateTime();
         foreach ($this->migrations as $migration) {
-            if (!$migration->isSuccessful() || !$migration->getVersion()) {
-                continue;
-            }
-            if (isset($result[$migration->getBundleName()])) {
-                if (version_compare($result[$migration->getBundleName()], $migration->getVersion()) === -1) {
-                    $result[$migration->getBundleName()] = $migration->getVersion();
-                }
-            } else {
-                $result[$migration->getBundleName()] = $migration->getVersion();
-            }
+            $sql = sprintf(
+                "INSERT INTO %s (bundle, version, loaded_at) VALUES ('%s', '%s', '%s')",
+                $this->migrationTable,
+                str_replace('\\', '/', get_class($migration->getMigration())),
+                $migration->getVersion(),
+                $date->format('Y-m-d H:i:s')
+            );
+            $queries->addQuery($sql);
         }
-
-        return $result;
     }
 }

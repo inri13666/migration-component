@@ -12,14 +12,26 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class LoadMigrationsCommand extends Command
+class LoadCommand extends Command
 {
+    const NAME = 'akuma:migrations:load';
+
+    /** @var MigrationConsoleHelper */
+    protected $helper;
+
+    public function __construct(MigrationConsoleHelper $helper = null)
+    {
+        parent::__construct(self::NAME);
+
+        $this->helper = $helper;
+    }
+
     /**
      * @inheritdoc
      */
     protected function configure()
     {
-        $this->setName('okvpn:migration:load')
+        $this->setName(self::NAME)
             ->setDescription('Execute migration scripts.')
             ->addOption(
                 'force',
@@ -38,18 +50,6 @@ class LoadMigrationsCommand extends Command
                 null,
                 InputOption::VALUE_NONE,
                 'Outputs list of database queries for each migration file.'
-            )
-            ->addOption(
-                'bundles',
-                null,
-                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
-                'A list of bundles to load data from. If option is not set, migrations will be taken from all bundles.'
-            )
-            ->addOption(
-                'exclude',
-                null,
-                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
-                'A list of bundle names which migrations should be skipped.'
             );
     }
 
@@ -60,14 +60,15 @@ class LoadMigrationsCommand extends Command
     {
         $force = $input->getOption('force');
         $dryRun = $input->getOption('dry-run');
+        $showQueries = $input->getOption('show-queries');
 
         if ($force || $dryRun) {
-            $output->writeln($dryRun ? 'List of migrations:' : 'Process migrations...');
-
-            $migrationLoader = $this->getMigrationLoader($input);
-            $migrations      = $migrationLoader->getMigrations();
+            $migrationLoader = $this->getMigrationLoader();
+            $migrations = $migrationLoader->getMigrations();
             if (!empty($migrations)) {
-                if ($input->getOption('dry-run') && !$input->getOption('show-queries')) {
+                $output->writeln($dryRun ? 'List of migrations:' : 'Process migrations...');
+
+                if ($dryRun && !$showQueries) {
                     foreach ($migrations as $item) {
                         $output->writeln(sprintf('  <comment>> %s</comment>', get_class($item->getMigration())));
                     }
@@ -76,14 +77,16 @@ class LoadMigrationsCommand extends Command
                     $showQueries = $input->getOption('show-queries');
                     $queryLogger = $this->getConsoleLogger(
                         $output,
-                        $showQueries ? OutputInterface::VERBOSITY_NORMAL: OutputInterface::VERBOSITY_VERBOSE
+                        $showQueries ? OutputInterface::VERBOSITY_NORMAL : OutputInterface::VERBOSITY_VERBOSE
                     );
 
                     $executor = $this->getMigrationExecutor();
                     $executor->setLogger($this->getConsoleLogger($output));
                     $executor->getQueryExecutor()->setLogger($queryLogger);
-                    $executor->executeUp($migrations, $input->getOption('dry-run'));
+                    $executor->executeUp($migrations, $dryRun);
                 }
+            } else {
+                $output->writeln('There are no migrations to be loaded');
             }
         } else {
             $output->writeln(
@@ -100,14 +103,13 @@ class LoadMigrationsCommand extends Command
      */
     protected function getOkvpnMigrationHelper()
     {
-        return $this->getHelper(MigrationConsoleHelper::NAME);
+        return $this->helper ?: $this->getHelper(MigrationConsoleHelper::NAME);
     }
 
     /**
-     * @param InputInterface $input
      * @return MigrationsLoader
      */
-    protected function getMigrationLoader(InputInterface $input)
+    protected function getMigrationLoader()
     {
         return $this->getOkvpnMigrationHelper()->getMigrationLoader();
     }
@@ -123,6 +125,7 @@ class LoadMigrationsCommand extends Command
     /**
      * @param OutputInterface $output
      * @param int $debug
+     *
      * @return ConsoleLogger
      */
     protected function getConsoleLogger(OutputInterface $output, $debug = OutputInterface::VERBOSITY_NORMAL)
